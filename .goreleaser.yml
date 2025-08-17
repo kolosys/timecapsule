@@ -62,10 +62,13 @@ brews:
     repository:
       owner: kolosys
       name: homebrew-tap
+      git:
+        url: "git@github.com:kolosys/homebrew-tap.git"
+        private_key: "{{ .Env.HOMEBREW_TAP_DEPLOY_KEY }}"
     commit_author:
-      name: goreleaserbot
-      email: goreleaser@carlosbecker.com
-    folder: Formula
+      name: kolosys
+      email: nickjpanella@gmail.com
+    directory: Formula
     goarm: "6"
     test: |
       system "#{bin}/go-timecapsule", "--help"
