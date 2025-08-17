@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -50,14 +49,16 @@ func main() {
 	unlockTime := time.Now().Add(3 * time.Second)
 	err := capsule.Store(ctx, "holiday-sale", promo, unlockTime)
 	if err != nil {
-		log.Fatal("Failed to store promo:", err)
+		fmt.Printf("❌ Failed to store promo: %v\n", err)
+		return
 	}
 
 	// Demo 2: Try to peek at the capsule
 	fmt.Println("\n2. Peeking at the capsule metadata...")
 	metadata, err := capsule.Peek(ctx, "holiday-sale")
 	if err != nil {
-		log.Fatal("Failed to peek:", err)
+		fmt.Printf("❌ Failed to peek: %v\n", err)
+		return
 	}
 
 	fmt.Printf("   Unlock time: %v\n", metadata.UnlockTime.Format("15:04:05"))
@@ -74,7 +75,8 @@ func main() {
 	fmt.Println("\n4. Waiting for the capsule to unlock...")
 	value, err := capsule.WaitForUnlock(ctx, "holiday-sale")
 	if err != nil {
-		log.Fatal("Failed to wait for unlock:", err)
+		fmt.Printf("❌ Failed to wait for unlock: %v\n", err)
+		return
 	}
 
 	fmt.Printf("   ✅ Unlocked! Promo code: %s, Discount: %d%%\n", value.Code, value.Discount)
@@ -85,19 +87,22 @@ func main() {
 	// Value that unlocks immediately
 	err = capsule.Store(ctx, "immediate", PromoCode{Code: "NOW", Discount: 10, Valid: true}, time.Now().Add(-1*time.Second))
 	if err != nil {
-		log.Fatal("Failed to store immediate:", err)
+		fmt.Printf("❌ Failed to store immediate: %v\n", err)
+		return
 	}
 
 	// Value that unlocks in 2 seconds
 	err = capsule.Store(ctx, "soon", PromoCode{Code: "SOON", Discount: 20, Valid: true}, time.Now().Add(2*time.Second))
 	if err != nil {
-		log.Fatal("Failed to store soon:", err)
+		fmt.Printf("❌ Failed to store soon: %v\n", err)
+		return
 	}
 
 	// Value that unlocks in 5 seconds
 	err = capsule.Store(ctx, "later", PromoCode{Code: "LATER", Discount: 30, Valid: true}, time.Now().Add(5*time.Second))
 	if err != nil {
-		log.Fatal("Failed to store later:", err)
+		fmt.Printf("❌ Failed to store later: %v\n", err)
+		return
 	}
 
 	// Demo 6: Check which capsules exist and their status
@@ -141,7 +146,8 @@ func main() {
 
 	err = capsule.Delay(ctx, "later", 1*time.Hour)
 	if err != nil {
-		log.Fatal("Failed to delay capsule:", err)
+		fmt.Printf("❌ Failed to delay capsule: %v\n", err)
+		return
 	}
 
 	newMeta, _ := capsule.Peek(ctx, "later")

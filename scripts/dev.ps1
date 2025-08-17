@@ -88,7 +88,7 @@ function Invoke-Security {
     catch {
         Write-Host "gosec not found. Installing..." -ForegroundColor Yellow
         try {
-            go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+            go install github.com/securego/gosec/v2/cmd/gosec@latest
             # Add GOPATH/bin to PATH for this session
             $env:PATH += ";$env:GOPATH\bin"
             gosec ./...
@@ -100,7 +100,7 @@ function Invoke-Security {
             }
             catch {
                 Write-Host "Security scanning failed. Please install gosec manually or use golangci-lint." -ForegroundColor Red
-                Write-Host "Manual installation: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest" -ForegroundColor Yellow
+                Write-Host "Manual installation: go install github.com/securego/gosec/v2/cmd/gosec@latest" -ForegroundColor Yellow
                 Write-Host "Note: In CI/CD, we use securego/gosec@master (official action) for security scanning" -ForegroundColor Yellow
             }
         }

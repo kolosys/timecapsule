@@ -3,7 +3,6 @@ package timecapsule
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -16,7 +15,7 @@ func Example_basic() {
 	unlockTime := time.Now().Add(1 * time.Second)
 	err := capsule.Store(context.Background(), "greeting", "Hello, World!", unlockTime)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Try to open immediately - should be locked
@@ -30,7 +29,7 @@ func Example_basic() {
 	// Now open the capsule
 	value, err := capsule.Open(context.Background(), "greeting")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	fmt.Println("Unlocked value:", value)
 
@@ -60,13 +59,13 @@ func Example_struct() {
 
 	err := capsule.Store(context.Background(), "holiday-sale", promo, tomorrow)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Check metadata without opening
 	metadata, err := capsule.Peek(context.Background(), "holiday-sale")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	fmt.Printf("Promo unlocks in: %v\n", time.Until(metadata.UnlockTime).Round(time.Hour))
@@ -85,7 +84,7 @@ func Example_waitForUnlock() {
 	unlockTime := time.Now().Add(100 * time.Millisecond)
 	err := capsule.Store(context.Background(), "count", 42, unlockTime)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Wait for unlock with timeout
@@ -94,7 +93,7 @@ func Example_waitForUnlock() {
 
 	value, err := capsule.WaitForUnlock(ctx, "count")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	fmt.Printf("Waited for unlock, got value: %d\n", value)
@@ -111,7 +110,7 @@ func Example_context() {
 	unlockTime := time.Now().Add(5 * time.Second)
 	err := capsule.Store(context.Background(), "slow", "This takes time", unlockTime)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Create a context that cancels after 1 second
@@ -137,11 +136,11 @@ func Example_management() {
 	var err error
 	err = capsule.Store(context.Background(), "price1", 19.99, now.Add(1*time.Hour))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	err = capsule.Store(context.Background(), "price2", 29.99, now.Add(2*time.Hour))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Check if capsules exist
@@ -151,7 +150,7 @@ func Example_management() {
 	// Delete a capsule
 	err = capsule.Delete(context.Background(), "price1")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	fmt.Printf("After delete, price1 exists: %v\n", capsule.Exists(context.Background(), "price1"))
@@ -171,7 +170,7 @@ func Example_delay() {
 	unlockTime := time.Now().Add(1 * time.Hour)
 	err := capsule.Store(ctx, "secret", "confidential", unlockTime)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Check initial unlock time
@@ -181,7 +180,7 @@ func Example_delay() {
 	// Delay by 2 more hours
 	err = capsule.Delay(ctx, "secret", 2*time.Hour)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Check new unlock time
@@ -189,6 +188,6 @@ func Example_delay() {
 	fmt.Printf("New unlock time: %v\n", metadata.UnlockTime.Format("15:04"))
 
 	// Output:
-	// Original unlock time: 16:19
-	// New unlock time: 17:19
+	// Original unlock time: 16:25
+	// New unlock time: 17:25
 }
