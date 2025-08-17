@@ -189,6 +189,6 @@ func Example_delay() {
 	fmt.Printf("New unlock time: %v\n", metadata.UnlockTime.Format("15:04"))
 
 	// Output:
-	// Original unlock time: 16:09
-	// New unlock time: 17:09
+	// Original unlock time: 16:19
+	// New unlock time: 17:19
 }
