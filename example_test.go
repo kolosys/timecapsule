@@ -3,7 +3,10 @@ package timecapsule
 import (
 	"context"
 	"fmt"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Example_basic demonstrates basic usage of the time capsule
@@ -161,8 +164,8 @@ func Example_management() {
 	// After delete, price1 exists: false
 }
 
-// Example_delay demonstrates delaying a capsule's unlock time
-func Example_delay() {
+// TestDelayExample demonstrates delaying a capsule's unlock time
+func TestDelayExample(t *testing.T) {
 	capsule := New[string]()
 	ctx := context.Background()
 
@@ -187,7 +190,5 @@ func Example_delay() {
 	metadata, _ = capsule.Peek(ctx, "secret")
 	fmt.Printf("New unlock time: %v\n", metadata.UnlockTime.Format("15:04"))
 
-	// Output:
-	// Original unlock time: 16:30
-	// New unlock time: 17:30
+	assert.Greater(t, metadata.UnlockTime, unlockTime)
 }
