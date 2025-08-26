@@ -5,7 +5,7 @@ This guide will help you get up and running quickly with this package.
 ## Installation
 
 ```bash
-go get {{.ImportPath}}
+go get github.com/kolosys/timecapsule
 ```
 
 ## Quick Start
@@ -20,12 +20,12 @@ import (
     "fmt"
     "log"
     
-    "{{.ImportPath}}"
+    "github.com/kolosys/timecapsule"
 )
 
 func main() {
     // Your code here
-    fmt.Println("Hello from {{.Name}}!")
+    fmt.Println("Hello from timecapsule!")
 }
 ```
 
@@ -33,4 +33,4 @@ func main() {
 
 - [API Reference](api-reference.md)
 - [Examples](examples.md)
-- [GitHub Repository](https://github.com/{{.Owner}}/{{.Name}})
+- [GitHub Repository](https://github.com/kolosys/timecapsule)
