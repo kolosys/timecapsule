@@ -2,12 +2,12 @@
   "repository": {
     "name": "timecapsule",
     "owner": "kolosys",
-    "description": "Time-based data storage and retrieval system for Go"
+    "description": "Time-based data storage for Go - store values that unlock at specified times"
   },
   "packages": [
     {
       "name": "timecapsule",
-      "description": "Time-based data storage with expiration, compression, and indexing",
+      "description": "Time-locked storage for values that are only retrievable after a specified time",
       "priority": 1
     }
   ],

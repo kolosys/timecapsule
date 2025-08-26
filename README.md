@@ -1,6 +1,9 @@
-# timecapsule
+# Timecapsule - Time-Based Data Storage for Go
 
-A lightweight Go library that lets developers **store values that are only retrievable after a specified time**. It acts like a "sealed envelope" or "time capsule" for objects, configs, or state.
+[![Go Reference](https://pkg.go.dev/badge/github.com/kolosys/timecapsule.svg)](https://pkg.go.dev/github.com/kolosys/timecapsule)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kolosys/timecapsule)](https://goreportcard.com/report/github.com/kolosys/timecapsule)
+
+Timecapsule is a lightweight Go library that provides time-based data storage and retrieval. Store values that are only accessible after a specified time - like a "sealed envelope" or "time capsule" for objects, configurations, or application state.
 
 ## 🎯 Problem Statement
 
@@ -18,16 +21,24 @@ Current approaches:
 
 There's **no simple Go‑native abstraction** for "don't unlock this value until X time."
 
-## ✨ Features
+## Features
 
 - **Simple API** - Store and retrieve time-locked values with ease
 - **Type Safety** - Full generics support for any data type
 - **Context Support** - Proper timeout and cancellation handling
 - **Thread Safe** - Concurrent access with read-write mutexes
 - **Extensible** - Pluggable storage backends (in-memory included)
-- **Idiomatic Go** - Follows Go best practices and conventions
+- **Minimal Dependencies** - Core functionality has zero external dependencies
 
-## 🚀 Quick Start
+## Quick Start
+
+### Installation
+
+```bash
+go get github.com/kolosys/timecapsule@latest
+```
+
+### Basic Usage
 
 ```go
 package main
@@ -69,7 +80,15 @@ func main() {
 }
 ```
 
-## 📖 API Reference
+## Design Principles
+
+- **Context-First** - All operations accept context for cancellation/timeouts
+- **No Panics** - Library code returns errors instead of panicking  
+- **Minimal Dependencies** - Core functionality has zero external dependencies
+- **Thread-Safe** - All public APIs are safe for concurrent use
+- **Type Safety** - Full generics support with compile-time type checking
+
+## API Reference
 
 ### Core Types
 
@@ -134,7 +153,7 @@ Checks if a capsule exists.
 
 Blocks until a capsule is unlocked or the context is cancelled.
 
-## 🔧 Usage Examples
+## Usage Examples
 
 ### Basic Usage
 
@@ -231,7 +250,7 @@ metadata, _ := capsule.Peek(context.Background(), "secret")
 fmt.Printf("New unlock time: %v\n", metadata.UnlockTime)
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### In-Memory Storage
 
@@ -266,39 +285,15 @@ Future backends will include:
 - SQLite
 - File system
 
-## 🧪 Testing
+## Contributing
 
-Run the test suite:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-```bash
-go test -v
-```
+## License
 
-Run tests with coverage:
+Licensed under the [MIT License](LICENSE).
 
-```bash
-go test -v -cover
-```
-
-## 📦 Installation
-
-```bash
-go get github.com/kolosys/timecapsule
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🎯 Use Cases
+## Use Cases
 
 ### Delayed Actions
 
@@ -332,12 +327,4 @@ capsule.Store(ctx, "new-pricing", pricingConfig,
     time.Now().Add(30*24*time.Hour))
 ```
 
-## 🔮 Roadmap
 
-- [ ] Persistent storage backends (Redis, PostgreSQL)
-- [ ] TTL cleanup (auto-purge expired capsules)
-- [ ] Notifications/callbacks when capsules unlock
-- [ ] Encryption for sealed data
-- [ ] Bulk operations
-- [ ] Metrics and monitoring
-- [ ] Webhook notifications
