@@ -1,0 +1,23 @@
+{
+  "repository": {
+    "name": "timecapsule",
+    "owner": "kolosys",
+    "description": "Time-based data storage and retrieval system for Go"
+  },
+  "packages": [
+    {
+      "name": "timecapsule",
+      "description": "Time-based data storage with expiration, compression, and indexing",
+      "priority": 1
+    }
+  ],
+  "docs": {
+    "root_dir": ".",
+    "docs_dir": "docs"
+  },
+  "output": {
+    "generate_combined_api": true,
+    "generate_examples": true,
+    "verbose": true
+  }
+}

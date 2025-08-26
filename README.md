@@ -1,4 +1,4 @@
-# go-timecapsule
+# timecapsule
 
 A lightweight Go library that lets developers **store values that are only retrievable after a specified time**. It acts like a "sealed envelope" or "time capsule" for objects, configs, or state.
 
@@ -38,7 +38,7 @@ import (
     "log"
     "time"
 
-    "github.com/kolosys/go-timecapsule"
+    "github.com/kolosys/timecapsule"
 )
 
 func main() {
@@ -283,7 +283,7 @@ go test -v -cover
 ## 📦 Installation
 
 ```bash
-go get github.com/kolosys/go-timecapsule
+go get github.com/kolosys/timecapsule
 ```
 
 ## 🤝 Contributing

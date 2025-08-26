@@ -1,0 +1,31 @@
+name: Generate Documentation
+
+on:
+  push:
+    branches: [main]
+    paths: 
+      - '**/*.go'
+      - 'docs/**'
+      - 'docs-templates/**'
+      - 'examples/**'
+      - 'kolosys-docs.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.go'
+      - 'docs/**'
+      - 'docs-templates/**'
+      - 'examples/**'
+      - 'kolosys-docs.json'
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    uses: kolosys/docs/.github/workflows/docs-workflow.yml@main
+    with:
+      repository_name: "timecapsule"
+      go_version: "1.22"
+      generate_examples: true
+      skip_commit: false
+    permissions:
+      contents: write

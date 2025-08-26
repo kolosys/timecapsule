@@ -1,4 +1,4 @@
-module github.com/kolosys/go-timecapsule
+module github.com/kolosys/timecapsule
 
 go 1.21
 

@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of go-timecapsule library
+- Initial release of timecapsule library
 - Core TimeCapsule interface with generic support
 - MemoryTimeCapsule implementation with thread-safe operations
 - PersistentTimeCapsule for pluggable storage backends

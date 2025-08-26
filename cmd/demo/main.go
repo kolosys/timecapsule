@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/kolosys/go-timecapsule"
+	"github.com/kolosys/timecapsule"
 )
 
 // These variables are set during build time via ldflags
@@ -25,13 +25,13 @@ type PromoCode struct {
 func main() {
 	// Check for version flag
 	if len(os.Args) > 1 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		fmt.Printf("go-timecapsule version %s\n", version)
+		fmt.Printf("timecapsule version %s\n", version)
 		fmt.Printf("Commit: %s\n", commit)
 		fmt.Printf("Build Date: %s\n", date)
 		return
 	}
 
-	fmt.Println("🚀 go-timecapsule Demo")
+	fmt.Println("🚀 timecapsule Demo")
 	fmt.Println("=====================")
 
 	// Create a new time capsule
