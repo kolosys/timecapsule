@@ -3,199 +3,170 @@
 ## Basic Usage
 
 ```go
-package timecapsule
+package main
 
 import (
 	"context"
 	"fmt"
-	"testing"
+	"os"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/kolosys/timecapsule"
 )
 
-// Example_basic demonstrates basic usage of the time capsule
-func Example_basic() {
-	// Create a new time capsule
-	capsule := New[string]()
+// These variables are set during build time via ldflags
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
 
-	// Store a value that unlocks in 1 second
-	unlockTime := time.Now().Add(1 * time.Second)
-	err := capsule.Store(context.Background(), "greeting", "Hello, World!", unlockTime)
-	if err != nil {
-		panic(err)
-	}
-
-	// Try to open immediately - should be locked
-	if _, openErr := capsule.Open(context.Background(), "greeting"); openErr != nil {
-		fmt.Println("Capsule is locked:", openErr)
-	}
-
-	// Wait for unlock
-	time.Sleep(2 * time.Second)
-
-	// Now open the capsule
-	value, err := capsule.Open(context.Background(), "greeting")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Unlocked value:", value)
-
-	// Output:
-	// Capsule is locked: capsule is still locked
-	// Unlocked value: Hello, World!
+type PromoCode struct {
+	Code     string `json:"code"`
+	Discount int    `json:"discount"`
+	Valid    bool   `json:"valid"`
 }
 
-// Example_struct demonstrates using structs with the time capsule
-func Example_struct() {
-	type Promo struct {
-		Code     string `json:"code"`
-		Discount int    `json:"discount"`
-		Valid    bool   `json:"valid"`
+func main() {
+	// Check for version flag
+	if len(os.Args) > 1 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
+		fmt.Printf("timecapsule version %s\n", version)
+		fmt.Printf("Commit: %s\n", commit)
+		fmt.Printf("Build Date: %s\n", date)
+		return
 	}
 
-	// Create a time capsule for Promo structs
-	capsule := New[Promo]()
+	fmt.Println("🚀 timecapsule Demo")
+	fmt.Println("=====================")
 
-	// Store a promotional code that unlocks tomorrow
-	tomorrow := time.Now().Add(24 * time.Hour)
-	promo := Promo{
+	// Create a new time capsule
+	capsule := timecapsule.New[PromoCode]()
+	ctx := context.Background()
+
+	// Demo 1: Store a promotional code that unlocks in 3 seconds
+	fmt.Println("\n1. Storing a promotional code that unlocks in 3 seconds...")
+	promo := PromoCode{
 		Code:     "HOLIDAY50",
 		Discount: 50,
 		Valid:    true,
 	}
 
-	err := capsule.Store(context.Background(), "holiday-sale", promo, tomorrow)
+	unlockTime := time.Now().Add(3 * time.Second)
+	err := capsule.Store(ctx, "holiday-sale", promo, unlockTime)
 	if err != nil {
-		panic(err)
+		fmt.Printf("❌ Failed to store promo: %v\n", err)
+		return
 	}
 
-	// Check metadata without opening
-	metadata, err := capsule.Peek(context.Background(), "holiday-sale")
+	// Demo 2: Try to peek at the capsule
+	fmt.Println("\n2. Peeking at the capsule metadata...")
+	metadata, err := capsule.Peek(ctx, "holiday-sale")
 	if err != nil {
-		panic(err)
+		fmt.Printf("❌ Failed to peek: %v\n", err)
+		return
 	}
 
-	fmt.Printf("Promo unlocks in: %v\n", time.Until(metadata.UnlockTime).Round(time.Hour))
-	fmt.Printf("Is locked: %v\n", metadata.IsLocked)
+	fmt.Printf("   Unlock time: %v\n", metadata.UnlockTime.Format("15:04:05"))
+	fmt.Printf("   Is locked: %v\n", metadata.IsLocked)
+	fmt.Printf("   Time until unlock: %v\n", time.Until(metadata.UnlockTime).Round(time.Second))
 
-	// Output:
-	// Promo unlocks in: 24h0m0s
-	// Is locked: true
-}
-
-// Example_waitForUnlock demonstrates waiting for a capsule to unlock
-func Example_waitForUnlock() {
-	capsule := New[int]()
-
-	// Store a value that unlocks in 100ms
-	unlockTime := time.Now().Add(100 * time.Millisecond)
-	err := capsule.Store(context.Background(), "count", 42, unlockTime)
-	if err != nil {
-		panic(err)
+	// Demo 3: Try to open the capsule (should fail)
+	fmt.Println("\n3. Trying to open the capsule now (should fail)...")
+	if _, openErr := capsule.Open(ctx, "holiday-sale"); openErr != nil {
+		fmt.Printf("   ❌ Expected error: %v\n", openErr)
 	}
 
-	// Wait for unlock with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	// Demo 4: Wait for unlock
+	fmt.Println("\n4. Waiting for the capsule to unlock...")
+	value, err := capsule.WaitForUnlock(ctx, "holiday-sale")
+	if err != nil {
+		fmt.Printf("❌ Failed to wait for unlock: %v\n", err)
+		return
+	}
+
+	fmt.Printf("   ✅ Unlocked! Promo code: %s, Discount: %d%%\n", value.Code, value.Discount)
+
+	// Demo 5: Store multiple values with different unlock times
+	fmt.Println("\n5. Storing multiple values with different unlock times...")
+
+	// Value that unlocks immediately
+	err = capsule.Store(ctx, "immediate", PromoCode{Code: "NOW", Discount: 10, Valid: true}, time.Now().Add(-1*time.Second))
+	if err != nil {
+		fmt.Printf("❌ Failed to store immediate: %v\n", err)
+		return
+	}
+
+	// Value that unlocks in 2 seconds
+	err = capsule.Store(ctx, "soon", PromoCode{Code: "SOON", Discount: 20, Valid: true}, time.Now().Add(2*time.Second))
+	if err != nil {
+		fmt.Printf("❌ Failed to store soon: %v\n", err)
+		return
+	}
+
+	// Value that unlocks in 5 seconds
+	err = capsule.Store(ctx, "later", PromoCode{Code: "LATER", Discount: 30, Valid: true}, time.Now().Add(5*time.Second))
+	if err != nil {
+		fmt.Printf("❌ Failed to store later: %v\n", err)
+		return
+	}
+
+	// Demo 6: Check which capsules exist and their status
+	fmt.Println("\n6. Checking capsule status...")
+	keys := []string{"immediate", "soon", "later", "holiday-sale"}
+
+	for _, key := range keys {
+		if capsule.Exists(ctx, key) {
+			meta, _ := capsule.Peek(ctx, key)
+			status := "🔒 LOCKED"
+			if !meta.IsLocked {
+				status = "🔓 UNLOCKED"
+			}
+			fmt.Printf("   %s: %s\n", key, status)
+		} else {
+			fmt.Printf("   %s: ❌ NOT FOUND\n", key)
+		}
+	}
+
+	// Demo 7: Open immediate capsule
+	fmt.Println("\n7. Opening immediate capsule...")
+	if value, openErr := capsule.Open(ctx, "immediate"); openErr == nil {
+		fmt.Printf("   ✅ %s: %d%% discount\n", value.Code, value.Discount)
+	}
+
+	// Demo 8: Wait for "soon" capsule with timeout
+	fmt.Println("\n8. Waiting for 'soon' capsule with timeout...")
+	timeoutCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	value, err := capsule.WaitForUnlock(ctx, "count")
-	if err != nil {
-		panic(err)
+	if value, waitErr := capsule.WaitForUnlock(timeoutCtx, "soon"); waitErr == nil {
+		fmt.Printf("   ✅ %s: %d%% discount\n", value.Code, value.Discount)
+	} else {
+		fmt.Printf("   ❌ Timeout: %v\n", waitErr)
 	}
 
-	fmt.Printf("Waited for unlock, got value: %d\n", value)
+	// Demo 9: Delay a capsule
+	fmt.Println("\n9. Delaying the 'later' capsule...")
+	originalMeta, _ := capsule.Peek(ctx, "later")
+	fmt.Printf("   Original unlock time: %v\n", originalMeta.UnlockTime.Format("15:04:05"))
 
-	// Output:
-	// Waited for unlock, got value: 42
-}
-
-// Example_context demonstrates using context for cancellation
-func Example_context() {
-	capsule := New[string]()
-
-	// Store a value that unlocks in 5 seconds
-	unlockTime := time.Now().Add(5 * time.Second)
-	err := capsule.Store(context.Background(), "slow", "This takes time", unlockTime)
+	err = capsule.Delay(ctx, "later", 1*time.Hour)
 	if err != nil {
-		panic(err)
+		fmt.Printf("❌ Failed to delay capsule: %v\n", err)
+		return
 	}
 
-	// Create a context that cancels after 1 second
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
+	newMeta, _ := capsule.Peek(ctx, "later")
+	fmt.Printf("   New unlock time: %v\n", newMeta.UnlockTime.Format("15:04:05"))
 
-	// Try to wait for unlock, but context will cancel first
-	_, err = capsule.WaitForUnlock(ctx, "slow")
-	if err != nil {
-		fmt.Println("Context canceled:", err)
+	// Demo 10: Clean up
+	fmt.Println("\n10. Cleaning up...")
+	for _, key := range keys {
+		if err := capsule.Delete(ctx, key); err == nil {
+			fmt.Printf("   ✅ Deleted: %s\n", key)
+		}
 	}
 
-	// Output:
-	// Context canceled: context deadline exceeded
-}
-
-// Example_management demonstrates capsule management operations
-func Example_management() {
-	capsule := New[float64]()
-
-	// Store multiple values
-	now := time.Now()
-	var err error
-	err = capsule.Store(context.Background(), "price1", 19.99, now.Add(1*time.Hour))
-	if err != nil {
-		panic(err)
-	}
-	err = capsule.Store(context.Background(), "price2", 29.99, now.Add(2*time.Hour))
-	if err != nil {
-		panic(err)
-	}
-
-	// Check if capsules exist
-	fmt.Printf("price1 exists: %v\n", capsule.Exists(context.Background(), "price1"))
-	fmt.Printf("price3 exists: %v\n", capsule.Exists(context.Background(), "price3"))
-
-	// Delete a capsule
-	err = capsule.Delete(context.Background(), "price1")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("After delete, price1 exists: %v\n", capsule.Exists(context.Background(), "price1"))
-
-	// Output:
-	// price1 exists: true
-	// price3 exists: false
-	// After delete, price1 exists: false
-}
-
-// TestDelayExample demonstrates delaying a capsule's unlock time
-func TestDelayExample(t *testing.T) {
-	capsule := New[string]()
-	ctx := context.Background()
-
-	// Store a value that unlocks in 1 hour
-	unlockTime := time.Now().Add(1 * time.Hour)
-	err := capsule.Store(ctx, "secret", "confidential", unlockTime)
-	if err != nil {
-		panic(err)
-	}
-
-	// Check initial unlock time
-	metadata, _ := capsule.Peek(ctx, "secret")
-	fmt.Printf("Original unlock time: %v\n", metadata.UnlockTime.Format("15:04"))
-
-	// Delay by 2 more hours
-	err = capsule.Delay(ctx, "secret", 2*time.Hour)
-	if err != nil {
-		panic(err)
-	}
-
-	// Check new unlock time
-	metadata, _ = capsule.Peek(ctx, "secret")
-	fmt.Printf("New unlock time: %v\n", metadata.UnlockTime.Format("15:04"))
-
-	assert.Greater(t, metadata.UnlockTime, unlockTime)
+	fmt.Println("\n🎉 Demo completed successfully!")
 }
 
 ```
