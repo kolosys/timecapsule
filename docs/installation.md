@@ -8,13 +8,13 @@
 ## Install via go get
 
 ```bash
-go get {{.ImportPath}}@latest
+go get github.com/kolosys/timecapsule@latest
 ```
 
 ## Install specific version
 
 ```bash
-go get {{.ImportPath}}@v0.1.0
+go get github.com/kolosys/timecapsule@v0.1.0
 ```
 
 ## Verify installation
@@ -27,11 +27,11 @@ package main
 import (
     "fmt"
     
-    "{{.ImportPath}}"
+    "github.com/kolosys/timecapsule"
 )
 
 func main() {
-    fmt.Println("{{.Name}} installed successfully!")
+    fmt.Println("timecapsule installed successfully!")
 }
 ```
 
@@ -47,11 +47,11 @@ Add to your `go.mod`:
 
 ```bash
 go mod init your-project
-go get {{.ImportPath}}@latest
+go get github.com/kolosys/timecapsule@latest
 ```
 
 ## Import packages
 
 ```go
-import "{{.ImportPath}}"
+import "github.com/kolosys/timecapsule"
 ```
